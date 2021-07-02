@@ -1,0 +1,7 @@
+/node_modules
+/.serverless
+/coverage
+/jest-stare
+/.dynamodb
+/package-lock.json
+/build

@@ -1,0 +1,97 @@
+pragma solidity ^0.8.0;
+
+import "./ERC721.sol";
+
+contract OchainMusic is ERC721 {
+    uint256 public fileCount = 0;
+    mapping(string => bool) _fileExists;
+    mapping(uint256 => File) public files;
+
+    constructor() ERC721("OchainMusic", "OCM") {}
+
+    struct File {
+        uint256 fileId;
+        string fileHash;
+        uint256 fileSize;
+        string fileType;
+        string fileName;
+        string fileDescription;
+        uint256 uploadTime;
+        address payable uploader;
+    }
+    event FileUploaded(
+        uint256 fileId,
+        string fileHash,
+        uint256 fileSize,
+        string fileType,
+        string fileName,
+        string fileDescription,
+        uint256 uploadTime,
+        address payable uploader
+    );
+
+    function mint(string memory _music) public {
+        require(!_musicExists[_music]);
+        musics.push(_music);
+        uint256 _id = musics.length - 1;
+        _mint(msg.sender, _id);
+        _musicExists[_music] = true;
+    }
+
+    function uploadFile(
+        string memory _fileHash,
+        uint256 _fileSize,
+        string memory _fileType,
+        string memory _fileName,
+        string memory _fileDescription
+    ) public {
+        
+        // Make sure the file hash exists
+        require(bytes(_fileHash).length > 0);
+        //check if file exists on contract
+        require(!_fileExists[_fileHash]);
+        // Make sure file type exists
+        require(bytes(_fileType).length > 0);
+        // Make sure file description exists
+        require(bytes(_fileDescription).length > 0);
+        // Make sure file fileName exists
+        require(bytes(_fileName).length > 0);
+        // Make sure uploader address exists
+        require(msg.sender != address(0));
+        // Make sure file size is more than 0
+        require(_fileSize > 0);
+
+        // Increment file id
+        fileCount++;
+
+        // Add File to the contract
+        files[fileCount] = File(
+            fileCount,
+            _fileHash,
+            _fileSize,
+            _fileType,
+            _fileName,
+            _fileDescription,
+            now,
+            msg.sender
+        );
+
+         _mint(msg.sender,fileCount);
+         _fileExists[_fileHash] = true;
+        // Trigger an event
+        emit FileUploaded(
+            fileCount,
+            _fileHash,
+            _fileSize,
+            _fileType,
+            _fileName,
+            _fileDescription,
+            now,
+            msg.sender
+        );
+    }
+
+    function totalSupply() external view returns (uint256) {
+        return files.length;
+    }
+}
