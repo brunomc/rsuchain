@@ -19,4 +19,4 @@ contract BrunoMCV02 is BrunoMC {
     }
     
     //upgradeable logic
-}x
+}
